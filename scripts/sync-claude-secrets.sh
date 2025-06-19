@@ -1,9 +1,14 @@
 #!/bin/bash
 
 # Check if credentials file exists
-CREDENTIALS_FILE="$HOME/.claude/.credentials.json"
-if [ ! -f "$CREDENTIALS_FILE" ]; then
-    echo "Error: Credentials file not found at $CREDENTIALS_FILE"
+# First check XDG_CONFIG_HOME, then fall back to ~/.claude
+# Note: As of 2025/06/19, Claude may have started using $XDG_CONFIG_HOME/claude for credentials
+if [ -n "$XDG_CONFIG_HOME" ] && [ -f "$XDG_CONFIG_HOME/claude/.credentials.json" ]; then
+    CREDENTIALS_FILE="$XDG_CONFIG_HOME/claude/.credentials.json"
+elif [ -f "$HOME/.claude/.credentials.json" ]; then
+    CREDENTIALS_FILE="$HOME/.claude/.credentials.json"
+else
+    echo "Error: Credentials file not found at $XDG_CONFIG_HOME/claude/.credentials.json or $HOME/.claude/.credentials.json"
     exit 1
 fi
 
